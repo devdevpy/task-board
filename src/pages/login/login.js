@@ -2,6 +2,7 @@ import loginTemplate from './login.html?raw';
 import './login.css';
 import { signIn, signUp } from '../../auth/authState.js';
 import { navigate } from '../../router/router.js';
+import { showToast } from '../../components/toast/toast.js';
 
 let mode = 'login'; // 'login' | 'register'
 
@@ -16,17 +17,6 @@ export function mountLoginPage() {
   const toggleBtn = document.getElementById('auth-toggle');
   const submitBtn = document.getElementById('auth-submit');
   const form = document.getElementById('auth-form');
-  const alertBox = document.getElementById('auth-alert');
-
-  function showAlert(message, type = 'danger') {
-    alertBox.textContent = message;
-    alertBox.className = `alert alert-${type} mb-3`;
-    alertBox.classList.remove('d-none');
-  }
-
-  function clearAlert() {
-    alertBox.classList.add('d-none');
-  }
 
   function updateUi() {
     if (mode === 'login') {
@@ -49,13 +39,11 @@ export function mountLoginPage() {
 
   toggleBtn.addEventListener('click', () => {
     mode = mode === 'login' ? 'register' : 'login';
-    clearAlert();
     updateUi();
   });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    clearAlert();
     submitBtn.disabled = true;
     submitBtn.classList.add('opacity-75');
 
@@ -71,12 +59,12 @@ export function mountLoginPage() {
     submitBtn.classList.remove('opacity-75');
 
     if (error) {
-      showAlert(error.message);
+      showToast(error.message, 'error');
       return;
     }
 
     if (mode === 'register') {
-      showAlert('Account created! Please check your email to confirm, then log in.', 'success');
+      showToast('Account created! Please check your email to confirm, then log in.', 'success', 6000);
       mode = 'login';
       updateUi();
       return;
