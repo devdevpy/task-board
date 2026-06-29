@@ -61,7 +61,28 @@ export async function mountProjectTasksPage(projectId) {
   }, {});
 
   if (stages.length === 0) {
-    board.innerHTML = '<div class="col-12 text-center text-muted-2 py-5">No stages defined for this project.</div>';
+    board.innerHTML = `
+      <div class="col-12 text-center text-muted-2 py-5">
+        <p>No stages defined for this project.</p>
+        <button type="button" class="btn btn-glow btn-sm px-3 py-2" id="create-default-stages">
+          <i data-lucide="columns-3"></i> Create default stages
+        </button>
+      </div>
+    `;
+    document.getElementById('create-default-stages')?.addEventListener('click', async () => {
+      const { error } = await supabase.from('stages').insert([
+        { project_id: projectId, name: 'Not Started', position: 0 },
+        { project_id: projectId, name: 'In Progress', position: 1 },
+        { project_id: projectId, name: 'Done', position: 2 },
+      ]);
+      if (error) {
+        showToast('Failed to create stages', 'error');
+      } else {
+        showToast('Default stages created', 'success');
+        mountProjectTasksPage(projectId);
+      }
+    });
+    if (window.lucide) window.lucide.createIcons();
     return;
   }
 

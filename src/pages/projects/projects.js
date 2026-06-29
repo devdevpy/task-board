@@ -170,6 +170,15 @@ export async function createProject(title, description) {
     .insert({ title, description, owner_id: user.id })
     .select()
     .single();
+
+  if (!error && data) {
+    await supabase.from('stages').insert([
+      { project_id: data.id, name: 'Not Started', position: 0 },
+      { project_id: data.id, name: 'In Progress', position: 1 },
+      { project_id: data.id, name: 'Done', position: 2 },
+    ]);
+  }
+
   return { project: data, error };
 }
 
