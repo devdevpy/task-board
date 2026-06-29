@@ -134,10 +134,10 @@ function renderTaskCard(task) {
         <span class="task-badge ${task.done ? 'badge-done' : 'badge-open'}">${task.done ? 'Done' : 'Open'}</span>
       </div>
       <div class="task-card-actions">
-        <button type="button" class="btn btn-icon btn-edit" title="Edit task">
+        <button type="button" class="btn btn-icon btn-edit" title="Edit task" draggable="false">
           <i data-lucide="pencil"></i>
         </button>
-        <button type="button" class="btn btn-icon btn-delete" title="Delete task">
+        <button type="button" class="btn btn-icon btn-delete" title="Delete task" draggable="false">
           <i data-lucide="trash-2"></i>
         </button>
       </div>
@@ -155,7 +155,9 @@ function setupDragAndDrop() {
   const lists = document.querySelectorAll('.task-list');
 
   cards.forEach((card) => {
-    card.addEventListener('dragstart', () => {
+    card.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', card.dataset.taskId);
+      e.dataTransfer.effectAllowed = 'move';
       card.classList.add('dragging');
     });
     card.addEventListener('dragend', () => {
@@ -164,8 +166,18 @@ function setupDragAndDrop() {
   });
 
   lists.forEach((list) => {
+    list.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      list.classList.add('drag-over');
+    });
+
+    list.addEventListener('dragleave', (e) => {
+      list.classList.remove('drag-over');
+    });
+
     list.addEventListener('dragover', (e) => {
       e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
       const afterElement = getDragAfterElement(list, e.clientY);
       const draggable = document.querySelector('.dragging');
       if (!draggable) return;
@@ -178,6 +190,7 @@ function setupDragAndDrop() {
 
     list.addEventListener('drop', async (e) => {
       e.preventDefault();
+      list.classList.remove('drag-over');
       const draggable = document.querySelector('.dragging');
       if (!draggable) return;
       const taskId = draggable.dataset.taskId;
