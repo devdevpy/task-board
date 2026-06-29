@@ -186,9 +186,13 @@ function setupDragAndDrop() {
       const newDone = isDoneStage(stageName);
 
       const siblings = [...list.querySelectorAll('.task-card')];
+      const orderedIds = siblings.map((card) => card.dataset.taskId);
       const newIndex = siblings.indexOf(draggable);
+      if (newIndex === -1) {
+        orderedIds.push(taskId);
+      }
 
-      const { error } = await updateTaskPosition(taskId, newStageId, newIndex, newDone);
+      const { error } = await updateTaskPosition(taskId, newStageId, newDone, orderedIds);
       if (error) {
         showToast('Failed to move task', 'error');
       } else {
@@ -214,32 +218,17 @@ function getDragAfterElement(container, y) {
   ).element;
 }
 
-async function updateTaskPosition(taskId, newStageId, newIndex, newDone) {
-  const { data: stageTasks, error: fetchError } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('stage_id', newStageId)
-    .neq('id', taskId)
-    .order('position', { ascending: true });
+async function updateTaskPosition(taskId, newStageId, newDone, orderedIds) {
+  const updates = orderedIds.map((id, index) => {
+    const payload = { position: index * 1000 };
+    if (id === taskId) {
+      payload.stage_id = newStageId;
+      payload.done = newDone;
+    }
+    return supabase.from('tasks').update(payload).eq('id', id);
+  });
 
-  if (fetchError) return { error: fetchError };
-
-  const sorted = stageTasks || [];
-  let newPosition;
-  if (sorted.length === 0) {
-    newPosition = 0;
-  } else if (newIndex <= 0) {
-    newPosition = sorted[0].position - 1000;
-  } else if (newIndex >= sorted.length) {
-    newPosition = sorted[sorted.length - 1].position + 1000;
-  } else {
-    newPosition = (sorted[newIndex - 1].position + sorted[newIndex].position) / 2;
-  }
-
-  const { error } = await supabase
-    .from('tasks')
-    .update({ stage_id: newStageId, position: newPosition, done: newDone })
-    .eq('id', taskId);
-
+  const results = await Promise.all(updates);
+  const error = results.find((r) => r.error)?.error;
   return { error };
 }
