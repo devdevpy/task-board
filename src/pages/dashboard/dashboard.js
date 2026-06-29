@@ -63,7 +63,7 @@ export async function mountDashboardPage() {
           (p) => `
           <div class="list-group-item d-flex justify-content-between align-items-center">
             <span>${p.title}</span>
-            <a href="/projects/${p.id}/tasks" data-link class="btn btn-ghost btn-sm px-2 py-1">
+            <a href="/project/${p.id}/tasks" data-link class="btn btn-ghost btn-sm px-2 py-1">
               Tasks <i data-lucide="arrow-right"></i>
             </a>
           </div>

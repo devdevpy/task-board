@@ -18,7 +18,7 @@ const routes = [
     render: (matches) => renderProjectFormPage(),
   },
   {
-    pattern: /^\/projects\/([^/]+)\/tasks$/,
+    pattern: /^\/project\/([^/]+)\/tasks$/,
     render: (matches) => renderProjectTasksPage(matches[1]),
   },
 ];
@@ -54,7 +54,7 @@ export function renderCurrentRoute() {
   const matched = matchRoute(path);
 
   const isProjectForm = path === '/project/add' || path.startsWith('/project/') && path.endsWith('/edit');
-  const isProjectTasks = path.startsWith('/projects/') && path.endsWith('/tasks');
+  const isProjectTasks = path.startsWith('/project/') && path.endsWith('/tasks') && !path.includes('/edit');
   if ((path === '/dashboard' || path === '/projects' || isProjectForm || isProjectTasks) && !isAuthenticated()) {
     navigate('/login');
     return;
@@ -76,7 +76,7 @@ export function renderCurrentRoute() {
     mountProjectFormPage();
   } else if (path.startsWith('/project/') && path.endsWith('/edit')) {
     mountProjectFormPage(matched.matches[1]);
-  } else if (path.startsWith('/projects/') && path.endsWith('/tasks')) {
+  } else if (path.startsWith('/project/') && path.endsWith('/tasks') && !path.includes('/edit')) {
     mountProjectTasksPage(matched.matches[1]);
   }
 
