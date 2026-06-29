@@ -64,7 +64,7 @@ export async function mountProjectsPage() {
           <td class="text-end">
             <div class="project-actions">
               <a href="/project/${p.id}/tasks" data-link class="btn btn-ghost btn-sm px-2 py-1" title="View Tasks">
-                <i data-lucide="layout-kanban"></i> Tasks
+                <i data-lucide="layout-kanban"></i> View Tasks
               </a>
               <a href="/project/${p.id}/edit" data-link class="btn btn-ghost btn-sm px-2 py-1" title="Edit">
                 <i data-lucide="pencil"></i>
