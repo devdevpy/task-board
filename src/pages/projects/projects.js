@@ -15,6 +15,12 @@ export async function mountProjectsPage() {
   const tbody = document.getElementById('projects-table-body');
   if (!tbody) return;
 
+  // Move the delete modal to body so it layers above the Bootstrap backdrop
+  const modal = document.getElementById('delete-project-modal');
+  if (modal && modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+
   if (!user) {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted-2 py-4">Please log in to view projects.</td></tr>';
     return;
