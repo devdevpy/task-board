@@ -1,0 +1,17 @@
+#projects-grid {
+  min-height: 200px;
+}
+
+#projects-grid .project-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#projects-grid .project-card h5 {
+  color: var(--text);
+}
+
+#projects-grid .project-card p {
+  flex: 1;
+}
