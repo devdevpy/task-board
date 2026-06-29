@@ -123,6 +123,72 @@ export async function mountProjectTasksPage(projectId) {
   }
 
   setupDragAndDrop();
+  setupAddTaskButtons(projectId);
+}
+
+function setupAddTaskButtons(projectId) {
+  document.querySelectorAll('.btn-add-task').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const list = btn.closest('.board-col').querySelector('.task-list');
+      if (list.querySelector('.add-task-form')) return;
+
+      const stageId = list.dataset.stageId;
+      const form = document.createElement('div');
+      form.className = 'add-task-form glass';
+      form.innerHTML = `
+        <input type="text" class="form-control form-control-sm mb-2" placeholder="Task title" id="new-task-title" required />
+        <textarea class="form-control form-control-sm mb-2" placeholder="Description (optional)" id="new-task-desc" rows="2"></textarea>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-glow btn-sm flex-fill" id="save-task">Add</button>
+          <button type="button" class="btn btn-ghost btn-sm flex-fill" id="cancel-task">Cancel</button>
+        </div>
+      `;
+      list.appendChild(form);
+      form.querySelector('#new-task-title').focus();
+
+      form.querySelector('#save-task').addEventListener('click', async () => {
+        const title = form.querySelector('#new-task-title').value.trim();
+        const description = form.querySelector('#new-task-desc').value.trim();
+        if (!title) {
+          showToast('Task title is required', 'error');
+          return;
+        }
+        const { error } = await createTask(projectId, stageId, title, description);
+        if (error) {
+          showToast('Failed to create task', 'error');
+        } else {
+          showToast('Task created', 'success');
+          mountProjectTasksPage(projectId);
+        }
+      });
+
+      form.querySelector('#cancel-task').addEventListener('click', () => {
+        form.remove();
+      });
+    });
+  });
+}
+
+async function createTask(projectId, stageId, title, description) {
+  const { data: existingTasks, error: countError } = await supabase
+    .from('tasks')
+    .select('position', { count: 'exact', head: true })
+    .eq('stage_id', stageId);
+
+  if (countError) return { error: countError };
+
+  const position = (existingTasks?.length || 0) * 1000;
+
+  const { error } = await supabase.from('tasks').insert({
+    project_id: projectId,
+    stage_id: stageId,
+    title,
+    description,
+    position,
+    done: false,
+  });
+
+  return { error };
 }
 
 function renderTaskCard(task) {

@@ -269,6 +269,30 @@
   color: var(--text);
 }
 
+.add-task-form {
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 0.25rem;
+}
+
+.add-task-form .form-control {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.add-task-form .form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.15rem rgba(139, 92, 246, 0.25);
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.add-task-form .form-control::placeholder {
+  color: var(--muted);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .project-info {
