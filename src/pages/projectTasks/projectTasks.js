@@ -12,7 +12,8 @@ export async function mountProjectTasksPage(projectId) {
   const user = getUser();
   const board = document.getElementById('task-board');
   const title = document.getElementById('project-tasks-title');
-  const subtitle = document.getElementById('project-tasks-subtitle');
+  const description = document.getElementById('project-tasks-description');
+  const breadcrumb = document.getElementById('project-breadcrumb-name');
   if (!board || !user) return;
 
   const { data: project, error: projectError } = await supabase
@@ -29,7 +30,8 @@ export async function mountProjectTasksPage(projectId) {
   }
 
   if (title) title.textContent = project.title;
-  if (subtitle) subtitle.textContent = 'Tasks board';
+  if (description) description.textContent = project.description || 'Kanban task board';
+  if (breadcrumb) breadcrumb.textContent = project.title;
 
   const { data: stages, error: stagesError } = await supabase
     .from('stages')
@@ -89,27 +91,41 @@ export async function mountProjectTasksPage(projectId) {
   board.innerHTML = stages
     .map((stage) => {
       const stageTasks = tasksByStage[stage.id] || [];
-      const dotClass = stage.name.toLowerCase().includes('done')
-        ? 'dot-done'
-        : stage.name.toLowerCase().includes('progress')
-          ? 'dot-progress'
-          : 'dot-todo';
+      const isDone = stage.name.toLowerCase().includes('done');
+      const isProgress = stage.name.toLowerCase().includes('progress');
+      const dotClass = isDone ? 'dot-done' : isProgress ? 'dot-progress' : 'dot-todo';
       return `
         <section class="board-col glass">
           <div class="board-col-head">
             <span class="dot ${dotClass}"></span> ${stage.name}
             <span class="badge stage-count">${stageTasks.length}</span>
           </div>
-          ${stageTasks
-            .map(
-              (task) => `
-            <article class="task-card glass ${task.done ? 'done' : ''}">
-              ${task.done ? '<i data-lucide="check"></i>' : ''}
-              <span class="task-title">${task.title}</span>
-            </article>
-          `
-            )
-            .join('')}
+          <div class="task-list">
+            ${stageTasks
+              .map(
+                (task) => `
+              <article class="task-card ${task.done ? 'done' : ''}">
+                <div class="task-card-body">
+                  <div class="task-title">${task.title}</div>
+                  ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
+                  <span class="task-badge ${task.done ? 'badge-done' : 'badge-open'}">${task.done ? 'Done' : 'Open'}</span>
+                </div>
+                <div class="task-card-actions">
+                  <button type="button" class="btn btn-icon btn-edit" title="Edit task">
+                    <i data-lucide="pencil"></i>
+                  </button>
+                  <button type="button" class="btn btn-icon btn-delete" title="Delete task">
+                    <i data-lucide="trash-2"></i>
+                  </button>
+                </div>
+              </article>
+            `
+              )
+              .join('')}
+          </div>
+          <button type="button" class="btn btn-add-task">
+            <i data-lucide="plus"></i> Add task
+          </button>
         </section>
       `;
     })
