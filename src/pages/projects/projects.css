@@ -1,3 +1,50 @@
+#projects-table-wrapper {
+  border-radius: var(--radius-lg);
+}
+
+.projects-table {
+  --bs-table-color: var(--text);
+  --bs-table-bg: transparent;
+  --bs-table-border-color: rgba(255, 255, 255, 0.08);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+  --bs-table-hover-color: var(--text);
+  font-size: 0.95rem;
+}
+
+.projects-table thead th {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem;
+  white-space: nowrap;
+}
+
+.projects-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.project-description {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-actions {
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.project-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 #projects-grid {
   min-height: 200px;
 }
@@ -14,4 +61,10 @@
 
 #projects-grid .project-card p {
   flex: 1;
+}
+
+.modal-content.glass {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
 }

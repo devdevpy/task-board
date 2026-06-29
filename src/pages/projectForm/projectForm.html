@@ -1,0 +1,40 @@
+<div class="project-form-page d-flex justify-content-center align-items-center py-5">
+  <div class="glass project-form-card p-4 p-md-5">
+    <div class="d-flex align-items-center gap-3 mb-4">
+      <a href="/projects" data-link class="btn btn-ghost btn-sm px-2 py-1">
+        <i data-lucide="arrow-left"></i>
+      </a>
+      <div>
+        <h2 class="mb-0" id="project-form-title">New project</h2>
+        <p class="text-muted-2 small mb-0" id="project-form-subtitle">Create a new project</p>
+      </div>
+    </div>
+
+    <form id="project-form">
+      <div class="mb-3">
+        <label for="project-title" class="form-label text-muted-2">Title</label>
+        <input
+          type="text"
+          class="form-control form-control-lg"
+          id="project-title"
+          placeholder="Project title"
+          required
+        />
+      </div>
+      <div class="mb-4">
+        <label for="project-description" class="form-label text-muted-2">Description</label>
+        <textarea
+          class="form-control"
+          id="project-description"
+          rows="4"
+          placeholder="Short description"
+        ></textarea>
+      </div>
+      <div class="d-grid">
+        <button type="submit" class="btn btn-glow btn-lg" id="project-submit">
+          <i data-lucide="save"></i> Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
