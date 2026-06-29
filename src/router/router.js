@@ -3,7 +3,7 @@ import { renderLoginPage, mountLoginPage } from '../pages/login/login.js';
 import { renderDashboardPage, mountDashboardPage } from '../pages/dashboard/dashboard.js';
 import { renderProjectsPage, mountProjectsPage } from '../pages/projects/projects.js';
 import { renderProjectFormPage, mountProjectFormPage } from '../pages/projectForm/projectForm.js';
-import { renderProjectTasksPage } from '../pages/projectTasks/projectTasks.js';
+import { renderProjectTasksPage, mountProjectTasksPage } from '../pages/projectTasks/projectTasks.js';
 import { highlightActiveLink } from '../components/header/header.js';
 import { isAuthenticated } from '../auth/authState.js';
 
@@ -54,7 +54,8 @@ export function renderCurrentRoute() {
   const matched = matchRoute(path);
 
   const isProjectForm = path === '/project/add' || path.startsWith('/project/') && path.endsWith('/edit');
-  if ((path === '/dashboard' || path === '/projects' || isProjectForm) && !isAuthenticated()) {
+  const isProjectTasks = path.startsWith('/projects/') && path.endsWith('/tasks');
+  if ((path === '/dashboard' || path === '/projects' || isProjectForm || isProjectTasks) && !isAuthenticated()) {
     navigate('/login');
     return;
   }
@@ -75,6 +76,8 @@ export function renderCurrentRoute() {
     mountProjectFormPage();
   } else if (path.startsWith('/project/') && path.endsWith('/edit')) {
     mountProjectFormPage(matched.matches[1]);
+  } else if (path.startsWith('/projects/') && path.endsWith('/tasks')) {
+    mountProjectTasksPage(matched.matches[1]);
   }
 
   highlightActiveLink();

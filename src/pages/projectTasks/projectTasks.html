@@ -1,44 +1,19 @@
 <div class="project-tasks-page">
   <header class="page-head mb-4">
     <div class="d-flex align-items-center gap-3">
-      <a href="/dashboard" data-link class="btn btn-ghost btn-sm px-3 py-2">
+      <a href="/projects" data-link class="btn btn-ghost btn-sm px-3 py-2">
         <i data-lucide="arrow-left"></i> Back
       </a>
       <div>
-        <p class="text-muted-2 small mb-1">Project {{projectId}}</p>
-        <h2 class="mb-0">Tasks board</h2>
+        <p class="text-muted-2 small mb-1" id="project-tasks-subtitle">Project</p>
+        <h2 class="mb-0" id="project-tasks-title">Tasks board</h2>
       </div>
     </div>
   </header>
 
-  <div class="board">
-    <section class="board-col glass">
-      <div class="board-col-head">
-        <span class="dot dot-todo"></span> Not Started
-      </div>
-      <article class="task-card glass">Implement API endpoints</article>
-      <article class="task-card glass">Write unit tests</article>
-      <article class="task-card glass">Deploy to production</article>
-    </section>
-
-    <section class="board-col glass">
-      <div class="board-col-head">
-        <span class="dot dot-progress"></span> In Progress
-      </div>
-      <article class="task-card glass">Design database schema</article>
-      <article class="task-card glass">Build core UI components</article>
-    </section>
-
-    <section class="board-col glass">
-      <div class="board-col-head">
-        <span class="dot dot-done"></span> Done
-      </div>
-      <article class="task-card glass done">
-        <i data-lucide="check"></i> Set up repository
-      </article>
-      <article class="task-card glass done">
-        <i data-lucide="check"></i> Define project scope
-      </article>
-    </section>
+  <div class="board-wrapper" id="board-wrapper">
+    <div class="board" id="task-board">
+      <div class="col-12 text-center text-muted-2 py-5">Loading tasks...</div>
+    </div>
   </div>
 </div>
