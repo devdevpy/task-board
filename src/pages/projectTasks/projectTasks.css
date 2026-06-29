@@ -1,4 +1,67 @@
-.project-tasks-page .list-group-item {
-  border-left: none;
-  border-right: none;
+.project-tasks-page .page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.board-col {
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.board-col-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-todo { background: #98a2c0; }
+.dot-progress { background: #ffce5c; }
+.dot-done { background: var(--accent-3); }
+
+.task-card {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  cursor: grab;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.task-card.done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.task-card.done i { color: var(--accent-3); }
+
+@media (max-width: 768px) {
+  .board { grid-template-columns: 1fr; }
 }

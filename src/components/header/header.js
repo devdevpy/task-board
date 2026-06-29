@@ -5,6 +5,9 @@ export function renderHeader() {
   const outlet = document.getElementById('header-outlet');
   outlet.innerHTML = headerTemplate;
   highlightActiveLink();
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
 export function highlightActiveLink() {

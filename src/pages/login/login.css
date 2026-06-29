@@ -1,8 +1,21 @@
 .login-page {
-  min-height: 70vh;
+  min-height: 75vh;
 }
 
 .login-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.login-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  font-size: 1.8rem;
+  color: #fff;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  box-shadow: var(--glow);
 }

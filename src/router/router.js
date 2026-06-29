@@ -51,6 +51,10 @@ export function renderCurrentRoute() {
   }
 
   highlightActiveLink();
+
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
 export function initRouter() {
