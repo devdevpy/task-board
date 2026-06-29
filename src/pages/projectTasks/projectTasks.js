@@ -106,7 +106,7 @@ export async function mountProjectTasksPage(projectId) {
           <div class="task-list" data-stage-id="${stage.id}">
             ${stageTasks
               .map(
-                (task) => renderTaskCard(task)
+                (task) => renderTaskCard(task, dotClass)
               )
               .join('')}
           </div>
@@ -191,9 +191,10 @@ async function createTask(projectId, stageId, title, description) {
   return { error };
 }
 
-function renderTaskCard(task) {
+function renderTaskCard(task, stageColorClass) {
   return `
     <article class="task-card ${task.done ? 'done' : ''}" draggable="true" data-task-id="${task.id}">
+      <span class="task-card-accent ${stageColorClass}"></span>
       <div class="task-card-body">
         <div class="task-title">${task.title}</div>
         ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
