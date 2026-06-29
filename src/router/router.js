@@ -1,8 +1,9 @@
 import { renderHomePage } from '../pages/home/home.js';
-import { renderLoginPage } from '../pages/login/login.js';
+import { renderLoginPage, mountLoginPage } from '../pages/login/login.js';
 import { renderDashboardPage } from '../pages/dashboard/dashboard.js';
 import { renderProjectTasksPage } from '../pages/projectTasks/projectTasks.js';
 import { highlightActiveLink } from '../components/header/header.js';
+import { isAuthenticated } from '../auth/authState.js';
 
 const routes = [
   { pattern: /^\/$/, render: () => renderHomePage() },
@@ -44,10 +45,19 @@ export function renderCurrentRoute() {
   const outlet = document.getElementById('page-outlet');
   const matched = matchRoute(path);
 
+  if (path === '/dashboard' && !isAuthenticated()) {
+    navigate('/login');
+    return;
+  }
+
   if (matched) {
     outlet.innerHTML = matched.render(matched.matches);
   } else {
     outlet.innerHTML = renderNotFound();
+  }
+
+  if (path === '/login') {
+    mountLoginPage();
   }
 
   highlightActiveLink();

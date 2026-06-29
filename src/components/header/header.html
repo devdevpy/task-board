@@ -23,10 +23,21 @@
         <li class="nav-item">
           <a class="nav-link" href="/dashboard" data-link>Dashboard</a>
         </li>
-        <li class="nav-item ms-lg-2">
+        <li class="nav-item ms-lg-2" id="auth-login-item">
           <a class="btn btn-glow btn-sm px-3 py-2" href="/login" data-link>
             <i data-lucide="log-in"></i> Login
           </a>
+        </li>
+        <li class="nav-item d-none ms-lg-2" id="auth-user-item">
+          <span class="nav-link d-inline-flex align-items-center gap-2">
+            <i data-lucide="user"></i>
+            <span id="auth-user-email"></span>
+          </span>
+        </li>
+        <li class="nav-item d-none ms-lg-1" id="auth-logout-item">
+          <button class="btn btn-ghost btn-sm px-3 py-2" id="auth-logout-btn" type="button">
+            <i data-lucide="log-out"></i> Logout
+          </button>
         </li>
       </ul>
     </div>
