@@ -4,11 +4,14 @@ import { supabase } from '../../lib/supabase.js';
 import { getUser } from '../../auth/authState.js';
 import { showToast } from '../../components/toast/toast.js';
 
+let currentProjectId = null;
+
 export function renderProjectTasksPage(projectId) {
   return projectTasksTemplate;
 }
 
 export async function mountProjectTasksPage(projectId) {
+  currentProjectId = projectId;
   const user = getUser();
   const board = document.getElementById('task-board');
   const title = document.getElementById('project-tasks-title');
@@ -91,35 +94,19 @@ export async function mountProjectTasksPage(projectId) {
   board.innerHTML = stages
     .map((stage) => {
       const stageTasks = tasksByStage[stage.id] || [];
-      const isDone = stage.name.toLowerCase().includes('done');
+      const isDone = isDoneStage(stage.name);
       const isProgress = stage.name.toLowerCase().includes('progress');
       const dotClass = isDone ? 'dot-done' : isProgress ? 'dot-progress' : 'dot-todo';
       return `
-        <section class="board-col glass">
+        <section class="board-col glass" data-stage-id="${stage.id}">
           <div class="board-col-head">
             <span class="dot ${dotClass}"></span> ${stage.name}
             <span class="badge stage-count">${stageTasks.length}</span>
           </div>
-          <div class="task-list">
+          <div class="task-list" data-stage-id="${stage.id}">
             ${stageTasks
               .map(
-                (task) => `
-              <article class="task-card ${task.done ? 'done' : ''}">
-                <div class="task-card-body">
-                  <div class="task-title">${task.title}</div>
-                  ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
-                  <span class="task-badge ${task.done ? 'badge-done' : 'badge-open'}">${task.done ? 'Done' : 'Open'}</span>
-                </div>
-                <div class="task-card-actions">
-                  <button type="button" class="btn btn-icon btn-edit" title="Edit task">
-                    <i data-lucide="pencil"></i>
-                  </button>
-                  <button type="button" class="btn btn-icon btn-delete" title="Delete task">
-                    <i data-lucide="trash-2"></i>
-                  </button>
-                </div>
-              </article>
-            `
+                (task) => renderTaskCard(task)
               )
               .join('')}
           </div>
@@ -134,4 +121,125 @@ export async function mountProjectTasksPage(projectId) {
   if (window.lucide) {
     window.lucide.createIcons();
   }
+
+  setupDragAndDrop();
+}
+
+function renderTaskCard(task) {
+  return `
+    <article class="task-card ${task.done ? 'done' : ''}" draggable="true" data-task-id="${task.id}">
+      <div class="task-card-body">
+        <div class="task-title">${task.title}</div>
+        ${task.description ? `<div class="task-desc">${task.description}</div>` : ''}
+        <span class="task-badge ${task.done ? 'badge-done' : 'badge-open'}">${task.done ? 'Done' : 'Open'}</span>
+      </div>
+      <div class="task-card-actions">
+        <button type="button" class="btn btn-icon btn-edit" title="Edit task">
+          <i data-lucide="pencil"></i>
+        </button>
+        <button type="button" class="btn btn-icon btn-delete" title="Delete task">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function isDoneStage(name) {
+  const lower = name.toLowerCase();
+  return lower.includes('done') || lower.includes('completed') || lower.includes('closed');
+}
+
+function setupDragAndDrop() {
+  const cards = document.querySelectorAll('.task-card');
+  const lists = document.querySelectorAll('.task-list');
+
+  cards.forEach((card) => {
+    card.addEventListener('dragstart', () => {
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+    });
+  });
+
+  lists.forEach((list) => {
+    list.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const afterElement = getDragAfterElement(list, e.clientY);
+      const draggable = document.querySelector('.dragging');
+      if (!draggable) return;
+      if (afterElement == null) {
+        list.appendChild(draggable);
+      } else {
+        list.insertBefore(draggable, afterElement);
+      }
+    });
+
+    list.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      const draggable = document.querySelector('.dragging');
+      if (!draggable) return;
+      const taskId = draggable.dataset.taskId;
+      const newStageId = list.dataset.stageId;
+      const stageName = list.closest('.board-col').querySelector('.board-col-head').textContent.trim();
+      const newDone = isDoneStage(stageName);
+
+      const siblings = [...list.querySelectorAll('.task-card')];
+      const newIndex = siblings.indexOf(draggable);
+
+      const { error } = await updateTaskPosition(taskId, newStageId, newIndex, newDone);
+      if (error) {
+        showToast('Failed to move task', 'error');
+      } else {
+        mountProjectTasksPage(currentProjectId);
+      }
+    });
+  });
+}
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.task-card:not(.dragging)')];
+  return draggableElements.reduce(
+    (closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child };
+      } else {
+        return closest;
+      }
+    },
+    { offset: Number.NEGATIVE_INFINITY }
+  ).element;
+}
+
+async function updateTaskPosition(taskId, newStageId, newIndex, newDone) {
+  const { data: stageTasks, error: fetchError } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('stage_id', newStageId)
+    .neq('id', taskId)
+    .order('position', { ascending: true });
+
+  if (fetchError) return { error: fetchError };
+
+  const sorted = stageTasks || [];
+  let newPosition;
+  if (sorted.length === 0) {
+    newPosition = 0;
+  } else if (newIndex <= 0) {
+    newPosition = sorted[0].position - 1000;
+  } else if (newIndex >= sorted.length) {
+    newPosition = sorted[sorted.length - 1].position + 1000;
+  } else {
+    newPosition = (sorted[newIndex - 1].position + sorted[newIndex].position) / 2;
+  }
+
+  const { error } = await supabase
+    .from('tasks')
+    .update({ stage_id: newStageId, position: newPosition, done: newDone })
+    .eq('id', taskId);
+
+  return { error };
 }

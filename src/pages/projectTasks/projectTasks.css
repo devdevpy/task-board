@@ -105,8 +105,14 @@
   gap: 0.75rem;
   overflow-y: auto;
   flex: 1;
-  min-height: 0;
-  padding-right: 0.25rem;
+  min-height: 48px;
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+  transition: background 0.2s ease;
+}
+
+.task-list:has(.dragging) {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .dot {
@@ -138,6 +144,13 @@
   transform: translateY(-2px);
   border-color: var(--accent);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.task-card.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  cursor: grabbing;
 }
 
 .task-card.done {
